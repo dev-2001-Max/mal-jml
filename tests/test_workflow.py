@@ -25,6 +25,7 @@ def test_leaver_end_to_end_mock_writes_audit(clients, settings):
     r = run_leaver(Leaver("omar.haddad@mal.example"), clients, settings)
     assert r.ok
     assert r.steps[0].data["action"] == "suspended"
+    assert r.steps[0].detail == "suspended (was ACTIVE)"
     line = json.loads(open(settings.audit_log).read().splitlines()[-1])
     assert line["flow"] == "leaver" and line["ok"] is True and line["run_id"] == r.run_id
 

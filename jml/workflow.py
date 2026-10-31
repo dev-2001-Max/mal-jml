@@ -132,8 +132,10 @@ def run_joiner(j: Joiner, c: Clients, settings: Settings, alert: bool = True) ->
 
 def run_leaver(lv: Leaver, c: Clients, settings: Settings, alert: bool = True) -> RunReport:
     r = RunReport("leaver", lv.email, dict(settings.mode))
-    verb = "deactivate" if lv.deactivate else "suspend"
-    _step(r, "okta", f"clear sessions + {verb}", lambda: c.okta.offboard(lv.email, lv.deactivate))
+    okta = _step(r, "okta", "clear sessions + offboard", lambda: c.okta.offboard(lv.email, lv.deactivate))
+    if okta:
+        # Report what Okta actually did (suspended vs deactivated), not what was planned.
+        r.steps[-1].detail = f"{okta['action']} (was {okta['previous_status']})"
     _step(r, "gws", "revoke OAuth tokens", lambda: c.gws.revoke_all_tokens(lv.email))
     _step(r, "gws", "sign out all sessions", lambda: c.gws.sign_out(lv.email))
     _step(r, "1password", "remove from groups + suspend", lambda: c.onepassword.offboard(lv.email))

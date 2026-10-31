@@ -30,7 +30,7 @@ mistaken for a real offboarding.
 - [x] Okta Developer org — joiner and leaver run live on 2026-10-31 (see Evidence)
 - [ ] Google Workspace trial
 - [ ] 1Password Business trial + SCIM Bridge
-- [ ] Slack webhook
+- [x] Slack webhook — joiner and leaver alerts posted to a real channel (see Evidence)
 
 ### Why SCIM for 1Password, not Connect or Events
 
@@ -131,7 +131,7 @@ CI (`.github/workflows/ci.yml`) runs all three on every push.
 
 ## Evidence (live Okta run, 2026-10-31)
 
-Okta ran **live** against an Okta Integrator org; Google Workspace, 1Password and Jamf ran in **mock** mode.
+Okta and the Slack alert ran **live**; Google Workspace, 1Password and Jamf ran in **mock** mode.
 Personal and ex-employer details and IP addresses are cropped or masked.
 
 **Joiner: Aisha Khan created and added to `engineering`**
@@ -154,6 +154,19 @@ Aisha shows **Pending user action**: Okta has emailed her activation link and sh
 
 The Okta steps succeeded live. The 1Password step failed because 1Password is mocked and its fixture only
 knows the sample user `omar.haddad@mal.example`; the failure is reported and does not stop the other steps.
+
+**Slack alerts (live webhook)**
+
+| Joiner alert | Leaver alert |
+|---|---|
+| ![joiner alert in Slack](docs/screenshots/13-slack-joiner-alert.png) | ![leaver alert in Slack with one failure](docs/screenshots/14-slack-leaver-alert.png) |
+
+![Omar Haddad deactivated in Okta](docs/screenshots/15-okta-omar-deactivated.png)
+
+Omar never activated his account (status `PROVISIONED`), and Okta can only suspend ACTIVE users, so the
+script **deactivated** him instead. The leaver alert above still said "suspend": it reported the planned
+action rather than the actual one. That alert prompted a fix: the Okta step now reports what Okta actually
+did, e.g. `deactivated (was PROVISIONED)`.
 
 **Okta System Log: the audit trail**
 
