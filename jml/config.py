@@ -57,6 +57,13 @@ def load_settings(load_dotenv: bool = True) -> Settings:
         else:
             mode[system] = "live" if configured else "mock"
 
+    sa_file = os.environ.get("GWS_SERVICE_ACCOUNT_FILE")
+    if mode["gws"] == "live" and not os.path.isfile(sa_file):
+        raise ConfigError(
+            f"GWS_SERVICE_ACCOUNT_FILE points to {sa_file!r}, which does not exist. "
+            "Fix the path, or leave the GWS_* values blank in .env to mock Google Workspace."
+        )
+
     return Settings(
         mode=mode,
         audit_log=os.environ.get("JML_AUDIT_LOG") or "logs/jml_audit.jsonl",

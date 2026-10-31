@@ -27,7 +27,7 @@ mistaken for a real offboarding.
 
 **Live verification log** — tick when run against a real tenant:
 
-- [ ] Okta Developer org
+- [x] Okta Developer org — joiner and leaver run live on 2026-10-31 (see Evidence)
 - [ ] Google Workspace trial
 - [ ] 1Password Business trial + SCIM Bridge
 - [ ] Slack webhook
@@ -114,7 +114,7 @@ Result: OK
 ## Tests and lint
 
 ```bash
-pytest -q          # 32 tests: HTTP-level tests per client (responses) + end-to-end mock runs
+pytest -q          # 33 tests: HTTP-level tests per client (responses) + end-to-end mock runs
 ruff check .
 black --check .
 ```
@@ -128,6 +128,52 @@ CI (`.github/workflows/ci.yml`) runs all three on every push.
 - No post-run verification (re-reading Okta status, 1Password Events API sign-in attempts).
 - No HRIS trigger — invoked from CLI; production would be an HRIS webhook or Okta Workflows.
 - No "mover" flow (role change = group diff); the joiner/leaver primitives cover it.
+
+## Evidence (live Okta run, 2026-10-31)
+
+Okta ran **live** against an Okta Integrator org; Google Workspace, 1Password and Jamf ran in **mock** mode.
+Personal and ex-employer details and IP addresses are cropped or masked.
+
+**Joiner: Aisha Khan created and added to `engineering`**
+
+| Before | Script output | After |
+|---|---|---|
+| ![engineering group, 0 members](docs/screenshots/02-okta-groups.png) | ![joiner run, okta live](docs/screenshots/03-joiner-terminal.png) | ![engineering group with Aisha](docs/screenshots/05-okta-group-member.png) |
+
+![Aisha Khan created, pending user action](docs/screenshots/04-okta-joiner-created.png)
+
+Aisha shows **Pending user action**: Okta has emailed her activation link and she becomes Active once she sets a password.
+
+**Leaver: Leaver Test offboarded**
+
+| Before (Active) | After (Suspended) |
+|---|---|
+| ![Leaver Test active](docs/screenshots/01-okta-before.png) | ![Leaver Test suspended](docs/screenshots/07-okta-after.png) |
+
+![leaver run output](docs/screenshots/06-leaver-terminal.png)
+
+The Okta steps succeeded live. The 1Password step failed because 1Password is mocked and its fixture only
+knows the sample user `omar.haddad@mal.example`; the failure is reported and does not stop the other steps.
+
+**Okta System Log: the audit trail**
+
+![Okta system log showing create, group add, clear sessions, suspend](docs/screenshots/08-okta-system-log.png)
+
+Read bottom to top: create user, activate, add to group (joiner); then clear sessions, suspend (leaver).
+Okta clears sessions again itself as part of suspending.
+
+**Failure handling**
+
+| Mock run: unknown user in 1Password | Live run: invalid Okta token (HTTP 401) |
+|---|---|
+| ![one step fails, others continue](docs/screenshots/10-failure-isolation.png) | ![401 not retried, dependent step skipped](docs/screenshots/12-live-401-handled.png) |
+
+The 401 came from an early misconfiguration (the template's placeholder org URL). It was not retried, the
+dependent group step was skipped, and the run reported 2 failures. That led to the template fix and a startup check.
+
+**Tests and lint**
+
+![33 tests passed, ruff and black clean](docs/screenshots/09-tests-lint.png)
 
 ## Part 2
 

@@ -62,6 +62,14 @@ def test_settings_live_mode_fails_fast_without_creds(monkeypatch):
         load_settings(load_dotenv=False)
 
 
+def test_settings_rejects_missing_gws_key_file(monkeypatch):
+    monkeypatch.setenv("JML_MODE", "auto")
+    monkeypatch.setenv("GWS_SERVICE_ACCOUNT_FILE", "/path/to/service-account.json")
+    monkeypatch.setenv("GWS_ADMIN_SUBJECT", "admin@example.com")
+    with pytest.raises(ConfigError, match="does not exist"):
+        load_settings(load_dotenv=False)
+
+
 def test_redact_hides_secrets():
     assert redact({"password": "x", "nested": [{"Authorization": "SSWS y"}], "ok": 1}) == {
         "password": "***",
