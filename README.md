@@ -129,6 +129,10 @@ CI (`.github/workflows/ci.yml`) runs all three on every push.
 - No HRIS trigger — invoked from CLI; production would be an HRIS webhook or Okta Workflows.
 - No "mover" flow (role change = group diff); the joiner/leaver primitives cover it.
 
+## Part 2
+
+Architecture and trade-offs write-up: [`docs/Mal_Endpoint_Identity_Architecture.pdf`](docs/Mal_Endpoint_Identity_Architecture.pdf)
+
 ## Layout
 
 ```
