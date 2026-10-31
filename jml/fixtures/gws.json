@@ -1,0 +1,19 @@
+{
+  "base_url": "https://admin.googleapis.com/admin/directory/v1",
+  "routes": [
+    {"method": "POST", "path_regex": "/admin/directory/v1/users", "status": 200,
+     "body": {"kind": "admin#directory#user", "id": "118234567890123456789", "primaryEmail": "aisha.khan@mal.example",
+              "name": {"givenName": "Aisha", "familyName": "Khan"}, "isAdmin": false, "orgUnitPath": "/"}},
+    {"method": "GET", "path_regex": "/admin/directory/v1/users/[^/]+/tokens", "status": 200,
+     "body": {"kind": "admin#directory#tokenList", "items": [
+        {"kind": "admin#directory#token", "clientId": "1234567890-slack.apps.googleusercontent.com", "displayText": "Slack", "anonymous": false, "nativeApp": false,
+         "scopes": ["openid", "https://www.googleapis.com/auth/userinfo.email"]},
+        {"kind": "admin#directory#token", "clientId": "9876543210-zoom.apps.googleusercontent.com", "displayText": "Zoom", "anonymous": false, "nativeApp": false,
+         "scopes": ["https://www.googleapis.com/auth/calendar"]},
+        {"kind": "admin#directory#token", "clientId": "5555555555-notion.apps.googleusercontent.com", "displayText": "Notion", "anonymous": false, "nativeApp": false,
+         "scopes": ["https://www.googleapis.com/auth/drive.readonly"]}
+     ]}},
+    {"method": "DELETE", "path_regex": "/admin/directory/v1/users/[^/]+/tokens/[^/]+", "status": 204},
+    {"method": "POST", "path_regex": "/admin/directory/v1/users/[^/]+/signOut", "status": 204}
+  ]
+}

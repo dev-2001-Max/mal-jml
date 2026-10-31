@@ -1,0 +1,9 @@
+{
+  "base_url": "https://mal-mock.jamfcloud.com",
+  "routes": [
+    {"method": "POST", "path_regex": "/api/v1/oauth/token", "status": 200,
+     "body": {"access_token": "mock-jamf-access-token", "scope": "api-role:enrollment", "token_type": "Bearer", "expires_in": 299}},
+    {"method": "POST", "path_regex": "/JSSResource/computerinvitations/id/0", "status": 201,
+     "text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><computer_invitation><id>4127</id><invitation>238476519203847561</invitation></computer_invitation>"}
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "base_url": "https://mal-mock.okta.com",
+  "routes": [
+    {"method": "POST", "path_regex": "/api/v1/users", "status": 200,
+     "body": {"id": "00u1aishakhan0001", "status": "ACTIVE", "created": "2026-10-31T06:00:00.000Z",
+              "profile": {"firstName": "Aisha", "lastName": "Khan", "email": "aisha.khan@mal.example", "login": "aisha.khan@mal.example"}}},
+    {"method": "GET", "path_regex": "/api/v1/groups", "status": 200,
+     "body": [{"id": "00g1engineering01", "type": "OKTA_GROUP", "profile": {"name": "engineering", "description": "Engineering staff"}},
+              {"id": "00g1engmanagers01", "type": "OKTA_GROUP", "profile": {"name": "engineering-managers", "description": ""}}]},
+    {"method": "PUT", "path_regex": "/api/v1/groups/[^/]+/users/[^/]+", "status": 204},
+    {"method": "GET", "path_regex": "/api/v1/users/[^/]+", "status": 200,
+     "body": {"id": "00u9omarhaddad001", "status": "ACTIVE",
+              "profile": {"firstName": "Omar", "lastName": "Haddad", "email": "omar.haddad@mal.example", "login": "omar.haddad@mal.example"}}},
+    {"method": "DELETE", "path_regex": "/api/v1/users/[^/]+/sessions", "status": 204},
+    {"method": "POST", "path_regex": "/api/v1/users/[^/]+/lifecycle/suspend", "status": 200, "body": {}},
+    {"method": "POST", "path_regex": "/api/v1/users/[^/]+/lifecycle/deactivate", "status": 200, "body": {}}
+  ]
+}
