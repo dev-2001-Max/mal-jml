@@ -25,12 +25,15 @@ leaver:  Okta kill sessions + suspend ─▶ GWS revoke OAuth + sign out ─▶ 
 rest; the alert footer always names which systems were mocked, so a mock run can't be
 mistaken for a real offboarding.
 
-**Live verification log** — tick when run against a real tenant:
+**Live verification status**
 
-- [x] Okta Developer org — joiner and leaver run live on 2026-10-31 (see Evidence)
-- [ ] Google Workspace trial
-- [ ] 1Password Business trial + SCIM Bridge
-- [x] Slack webhook — joiner and leaver alerts posted to a real channel (see Evidence)
+| System | Run live? | Notes |
+|---|---|---|
+| Okta | ✅ Yes, 2026-10-31 | Joiner and leaver against an Okta Integrator org (see Evidence) |
+| Slack | ✅ Yes, 2026-10-31 | Joiner and leaver alerts posted to a real channel (see Evidence) |
+| Google Workspace | ➖ Mocked | The trial needs a domain I own plus a service account with domain-wide delegation. The client calls the real Admin SDK endpoints and is tested at HTTP level; running it live only needs `GWS_*` set in `.env`. |
+| 1Password | ➖ Mocked | Vault access is managed through the SCIM Bridge, which has to be deployed as a server. The client follows the SCIM 2.0 API and is tested at HTTP level; running it live only needs `OP_*` set in `.env`. |
+| Jamf | ➖ Mocked | No free Jamf Pro tenant; the brief allows mocking. Payload modelled on the Classic API `computerinvitations` resource. |
 
 ### Why SCIM for 1Password, not Connect or Events
 
@@ -128,6 +131,18 @@ CI (`.github/workflows/ci.yml`) runs all three on every push.
 - No post-run verification (re-reading Okta status, 1Password Events API sign-in attempts).
 - No HRIS trigger — invoked from CLI; production would be an HRIS webhook or Okta Workflows.
 - No "mover" flow (role change = group diff); the joiner/leaver primitives cover it.
+- No AWS step: AWS federated sessions outlive the Okta session, so production would add a role-level
+  "revoke active sessions" step and keep AWS session duration short.
+
+## Known issues
+
+- **A rerun escalates.** A second leaver run finds the user already SUSPENDED and deactivates them.
+  A retry should be a no-op.
+- **No confirmation before a live leaver.** A typo in the email offboards the wrong person immediately.
+- **Mocks are too forgiving.** The Okta fixture returns the same user for any email, so tests can't catch
+  "acted on the wrong user".
+- **Long-lived admin token.** The Okta SSWS token carries its creator's admin rights; production would use
+  an OAuth 2.0 service app with `okta.users.manage` / `okta.groups.manage` scopes only.
 
 ## Evidence (live Okta run, 2026-10-31)
 
